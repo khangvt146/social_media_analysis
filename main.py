@@ -1,0 +1,1 @@
+from services.kafka_gcs_streaming_service import main

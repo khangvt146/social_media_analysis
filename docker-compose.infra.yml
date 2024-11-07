@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  kafka-broker-1:
+    image: bitnami/kafka:3.7.1
+    container_name: kafka
+
+    environment:
+      # The node ID for broker instance
+      KAFKA_CFG_NODE_ID: 0
+
+      # The roles of node in KRaft
+      KAFKA_CFG_PROCESS_ROLES: 'broker,controller'
+
+      # The list of controller nodes with format node_id@hostname:port
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: '0@localhost:9093'
+
+      # The listener name used for communication between controllers in Kafka cluster.
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # The listener name used for communication between Kafka brokers internally.
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL_HOST
+
+      # Maps each listener name to a specific security protocol.
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL_HOST:PLAINTEXT,EXTERNAL_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT'
+
+      # Defines the addresses and ports which Kafka will bind and listen for connections.
+      KAFKA_CFG_LISTENERS: 'INTERNAL_HOST://:9092,EXTERNAL_HOST://:19092,CONTROLLER://:9093'
+
+      # Specifies how Kafka broker will advertise to Clients and other Brokers.
+      KAFKA_CFG_ADVERTISED_LISTENERS: 'INTERNAL_HOST://kafka-broker-1:9092,EXTERNAL_HOST://172.29.15.4:19092'
+
+      # Performance and Reliability Settings
+      KAFKA_CFG_NUM_PARTITIONS: 1
+      KAFKA_CFG_LOG_RETENTION_HOURS: 336 # 2 Weeks
+      KAFKA_CFG_LOG_RETENTION_BYTES: 1073741824
+      KAFKA_CFG_SEGMENT_BYTES: 1073741824
+
+      # Consumer Group Configurations
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_CFG_DELETE_TOPIC_ENABLE: 'true'
+
+      # Garbage Collection (GC) Tuning for JVM
+      KAFKA_HEAP_OPTS: '-Xmx1G -Xms1G'
+
+    ports:
+      - '19092:19092' # Broker port
+      - '9093:9093' # Controller port
+    volumes:
+      - 'kafka_broker_1_data:/bitnami/kafka'
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
+
+    ports:
+      - "19000:9000"
+
+    environment:
+      KAFKA_BROKERCONNECT: "kafka-broker-1:9092"
+      JVM_OPTS: "-Xms32M -Xmx64M"
+
+    depends_on:
+      - kafka-broker-1
+
+volumes:
+  kafka_broker_1_data:
+    driver: local

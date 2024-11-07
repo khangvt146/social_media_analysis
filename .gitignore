@@ -31,5 +31,6 @@ env/
 *.pyc
 *.pyo
 *.pyd
-
+.env
 configs/
+*checkpoint*

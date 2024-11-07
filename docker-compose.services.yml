@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  reddit-streaming:
+    image: khangvt146/reddit_streaming_service:v1.0.0
+    container_name: reddit_streaming
+
+    build:
+      context: .
+      dockerfile: ./services/reddit_streaming_service/Dockerfile
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2GB
+      replicas: 1
+    
+    volumes:
+      - ./configs:/app/configs
+
+    restart: always
+    init: true
+
+  kafka-gcs-streaming:
+    image: khangvt146/kafka_gcs_streaming_service:v1.0.0
+    container_name: kafka_gcs_streaming
+
+    build:
+      context: .
+      dockerfile: ./services/kafka_gcs_streaming_service/Dockerfile
+
+    # Mapping spark_checkpoint to local file
+    volumes:
+      - ./spark_checkpoint:/app/spark_checkpoint
+      - ./configs:/app/configs
+
+    network_mode: "host"
+    restart: always
+    init: true
