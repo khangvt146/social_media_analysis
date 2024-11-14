@@ -57,7 +57,7 @@ class KafkaToGcsStreaming:
             .config("spark.hadoop.fs.gs.auth.type", "SERVICE_ACCOUNT_JSON_KEYFILE")
             .config(
                 "spark.hadoop.fs.gs.auth.service.account.json.keyfile",
-                f"{os.getcwd()}/{self.config['GCS']['SERVICES_ACCOUNT_PATH']}",
+                self.config["GCS"]["SERVICES_ACCOUNT_PATH"],
             )
             .config(
                 "spark.hadoop.fs.gs.impl",
@@ -90,19 +90,13 @@ class KafkaToGcsStreaming:
         """
         Write each mini-batch to GCS using gcs-connector.
         """
-        try:
-            gcs_path = self.config["GCS"]["BUCKET_PATH"]
+        gcs_path = self.config["GCS"]["BUCKET_PATH"]
 
-            batch_df.write.mode("append").format("parquet").option(
-                "compression", "snappy"
-            ).partitionBy("platform", "year", "month", "day", "topic").save(gcs_path)
+        batch_df.write.mode("append").format("parquet").option(
+            "compression", "snappy"
+        ).partitionBy("platform", "year", "month", "day", "topic").save(gcs_path)
 
-            self.logger.info(f"Batch ID: {batch_id} | Writing data to GCS successful.")
-
-        except Exception as e:
-            self.logger.error(
-                f"Batch ID: {batch_id} | Error when writing to GCS. Details: {e}"
-            )
+        self.logger.info(f"Batch ID: {batch_id} | Writing data to GCS successful.")
 
     def start_streaming(self, listener: StreamingQueryListener = None) -> None:
         """
@@ -173,7 +167,7 @@ class KafkaToGcsStreaming:
                 "checkpointLocation",
                 f"file://{os.getcwd()}/{self.config['SPARK']['CHECKPOINT_PATH']}",
             )
-            .trigger(processingTime="1 minute") \
+            .trigger(processingTime="10 minute")
             .start()
         )
         # Keep the stream running

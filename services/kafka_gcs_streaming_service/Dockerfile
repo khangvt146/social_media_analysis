@@ -15,6 +15,9 @@ RUN apt-get update && \
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
+RUN mkdir -p /etc/opt/google_credentials
+COPY ./configs/de_project_services_account.json /etc/opt/google_credentials/de_project_services_account.json
+
 WORKDIR /app
 
 ENV HADOOP_CONF_DIR=/app/configs
