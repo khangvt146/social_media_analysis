@@ -171,7 +171,6 @@ if __name__ == "__main__":
     df = pd.DataFrame()
     sql.insert_to_table("topic_clustering_1m", df)
 
-    # Delete all table in table "topic_clustering_1m"
+    # Delete all records in table "topic_clustering_1m"
     sql_cmd = "delete from topic_clustering_1m"
     sql.execute_sql_command(sql_cmd)
-
