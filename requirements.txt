@@ -13,3 +13,9 @@ pyarrow == 17.0.0
 SQLAlchemy == 1.4.36
 psycopg2-binary ==  2.9.7
 # pip install pyspark-stubs --no-deps
+bertopic
+hdbscan
+umap
+sentence-transformers
+matplotlib
+openai
